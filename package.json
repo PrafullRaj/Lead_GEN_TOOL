@@ -1,0 +1,14 @@
+{
+    "name": "leadgen-pro",
+    "version": "1.0.0",
+    "description": "B2B Lead Generation Dashboard with Multi-Source Scraping",
+    "scripts": {
+        "start": "node server/server.js",
+        "build": "cd client && npm install && npm run build",
+        "install:all": "cd server && npm install && cd ../client && npm install",
+        "dev": "cd server && npm start"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

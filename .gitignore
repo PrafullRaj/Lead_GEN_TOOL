@@ -1,0 +1,8 @@
+node_modules
+client/node_modules
+client/dist
+server/debug_*.png
+server/test_scraper.js
+server/debug_scraper.js
+.env
+*.log
