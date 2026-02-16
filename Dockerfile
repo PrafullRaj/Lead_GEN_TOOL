@@ -1,10 +1,9 @@
 FROM node:18-slim
 
-# Install Chromium dependencies for Puppeteer
+# Install Chromium and ALL its dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
-    libappindicator3-1 \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -20,32 +19,35 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    wget \
+    ca-certificates \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Tell Puppeteer to use the system Chromium
+# Tell Puppeteer to skip downloading Chromium and use system one
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 WORKDIR /app
 
-# Install server dependencies
-COPY server/package*.json ./server/
-RUN cd server && npm install --production
+# Install server dependencies first (for Docker caching)
+COPY server/package.json server/package-lock.json ./server/
+RUN cd server && npm ci --production
 
-# Install client dependencies and build
-COPY client/package*.json ./client/
-RUN cd client && npm install
-
+# Install client dependencies and build the React app
+COPY client/package.json client/package-lock.json ./client/
+RUN cd client && npm ci
 COPY client/ ./client/
 RUN cd client && npm run build
 
-# Copy server code
+# Copy server source code
 COPY server/ ./server/
 
-# Copy root package.json
+# Copy root files
 COPY package.json ./
 
+# Render uses PORT env var
+ENV PORT=3000
 EXPOSE 3000
 
 CMD ["node", "server/server.js"]

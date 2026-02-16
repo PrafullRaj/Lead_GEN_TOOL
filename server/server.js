@@ -46,7 +46,7 @@ app.post('/api/search', async (req, res) => {
 });
 
 // Serve React app for any non-API route (SPA fallback)
-app.get('*', (req, res) => {
+app.get('/{*path}', (req, res) => {
     res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
